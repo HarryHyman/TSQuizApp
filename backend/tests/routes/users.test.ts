@@ -45,6 +45,15 @@ describe("POST /api/users/register", () => {
         expect(res.body).toHaveProperty("message");
         expect(res.body.message).toEqual("\"password\" is required");
     });
+
+    it ("should return 400 if password is less than 8 characters", async () => {
+        const res = await request.post("/api/users/register").send({ username: "username", displayName: "displayName", email: "email@gmail.com", password: "pass" });
+
+        expect(res.status).toBe(400);
+        expect(res.type).toEqual("application/json");
+        expect(res.body).toHaveProperty("message");
+        expect(res.body.message).toEqual("\"password\" length must be at least 8 characters long");
+    });
     
     it("should return 400 if confirmPassword is not provided", async () => {
         const res = await request.post("/api/users/register").send({ username: "username", displayName: "displayName", email: "email@gmail.com", password: "password" });
