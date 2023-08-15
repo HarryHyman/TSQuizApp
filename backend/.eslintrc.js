@@ -1,4 +1,6 @@
 module.exports = {
+    "jest": true,
+    "node": true,
     "env": {
         "es2021": true,
         "node": true
