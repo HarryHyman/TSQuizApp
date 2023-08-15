@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users User[]
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  username    String        @unique
+  displayName String
+  password    String
+  role        Role          @relation(fields: [roleId], references: [id])
+  roleId      Int
+  quizzes     Quiz[]
+  attempts    QuizAttempt[]
+}
+
+model Quiz {
+  id        Int           @id @default(autoincrement())
+  name      String
+  createdAt DateTime      @default(now())
+  createdBy User          @relation(fields: [userId], references: [id])
+  userId    Int
+  questions Question[]
+  attempts  QuizAttempt[]
+}
+
+model Question {
+  id               Int                @id @default(autoincrement())
+  quiz             Quiz               @relation(fields: [quizId], references: [id])
+  quizId           Int
+  question         String
+  options          QuestionOption[]   @relation("Question")
+  QuestionResponse QuestionResponse[]
+}
+
+model QuestionOption {
+  id         Int      @id @default(autoincrement())
+  question   Question @relation("Question", fields: [questionId], references: [id])
+  questionId Int
+  text       String
+  correct    Boolean
+}
+
+model QuizAttempt {
+  id               String             @id @default(uuid())
+  quiz             Quiz               @relation(fields: [quizId], references: [id])
+  quizId           Int
+  user             User               @relation(fields: [userId], references: [id])
+  userId           Int
+  score            Int
+  timestamp        DateTime           @default(now())
+  QuestionResponse QuestionResponse[]
+}
+
+model QuestionResponse {
+  quizAttempt   QuizAttempt @relation(fields: [quizAttemptId], references: [id])
+  quizAttemptId String
+  question      Question    @relation(fields: [questionId], references: [id])
+  questionId    Int
+
+  @@id([quizAttemptId, questionId])
+}
