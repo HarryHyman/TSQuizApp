@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../services/database";
 import { USER_ROLE_ID } from "../util/constants";
+import { RegisterUser } from "../validators/registerUser.validator";
 
 export type CreateUser = {
     email: string,
@@ -40,7 +41,7 @@ export class UserController {
     }
 
     static async registerUser(req: Request, res: Response) {
-        const info = req.body as CreateUser;
+        const info = req.body as RegisterUser;
 
         if (await UserController.emailInUse(info.email)) {
             res.status(409).send({
@@ -68,6 +69,6 @@ export class UserController {
 
         // return not implemented
         console.log("registerUser not implemented");
-        res.status(204).send();
+        res.status(204).end();
     }
 }
