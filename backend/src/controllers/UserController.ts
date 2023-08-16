@@ -67,8 +67,6 @@ export class UserController {
 
         const user = await UserController.createUser(data);
 
-        // return not implemented
-        console.log("registerUser not implemented");
         res.status(204).end();
     }
 }

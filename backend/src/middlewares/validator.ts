@@ -19,6 +19,5 @@ export default <T>(validator: ObjectSchema<T>) => {
 
             next(e);
         }
-        console.log("it ran!");
     };
 };
