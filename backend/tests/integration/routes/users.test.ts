@@ -1,4 +1,4 @@
-import request from "../setup";
+import request from "../../setup";
 
 describe("POST /api/users/register", () => {
     it("should return 400 if username is not provided", async () => {

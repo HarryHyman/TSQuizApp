@@ -1,7 +1,14 @@
 import { Request, Response } from "express";
-import { RegisterUser } from "../validators/registerUser.validator";
 import prisma from "../services/database";
 import { USER_ROLE_ID } from "../util/constants";
+
+export type CreateUser = {
+    email: string,
+    username: string,
+    displayName: string,
+    password: string,
+    roleId: number
+}
 
 export class UserController {
     static async emailInUse(email: string) {
@@ -24,8 +31,16 @@ export class UserController {
         return user !== null;
     }
 
+    static async createUser(data: CreateUser) {
+        const user = await prisma.user.create({
+            data: data
+        });
+
+        return user;
+    }
+
     static async registerUser(req: Request, res: Response) {
-        const info = req.body as RegisterUser;
+        const info = req.body as CreateUser;
 
         if (await UserController.emailInUse(info.email)) {
             res.status(409).send({
@@ -41,15 +56,15 @@ export class UserController {
             return;
         }
 
-        const user = await prisma.user.create({
-            data: {
-                email: info.email,
-                username: info.username,
-                displayName: info.displayName,
-                password: info.password, // TODO: hash password
-                roleId: USER_ROLE_ID,
-            }
-        });
+        const data: CreateUser = {
+            email: info.email,
+            username: info.username,
+            displayName: info.displayName,
+            password: info.password,
+            roleId: USER_ROLE_ID
+        }
+
+        const user = await UserController.createUser(data);
 
         // return not implemented
         console.log("registerUser not implemented");
