@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { UserController } from "../../../src/controllers/UserController";
+import { UserController } from "../../../src/controllers/user.controller";
 import { RegisterUser } from "../../../src/validators/registerUser.validator";
+import { UserService } from "../../../src/services/user.service";
 
 // FIXME: DRY
 const mockedRes = {
@@ -25,15 +26,15 @@ describe("User Controller", () => {
                 body: data
             } as Request;
 
-            UserController.emailInUse = jest.fn().mockResolvedValue(false);
-            UserController.usernameInUse = jest.fn().mockResolvedValue(false);
-            UserController.createUser = jest.fn().mockResolvedValue({ ...data, id: 1 });
+            UserService.emailInUse = jest.fn().mockResolvedValue(false);
+            UserService.usernameInUse = jest.fn().mockResolvedValue(false);
+            UserService.register = jest.fn().mockResolvedValue({ ...data, id: 1 });
 
             await UserController.registerUser(req, mockedRes);
 
-            expect(UserController.emailInUse).toHaveBeenCalledWith(data.email);
-            expect(UserController.usernameInUse).toHaveBeenCalledWith(data.username);
-            expect(UserController.createUser).toHaveBeenCalledWith({
+            expect(UserService.emailInUse).toHaveBeenCalledWith(data.email);
+            expect(UserService.usernameInUse).toHaveBeenCalledWith(data.username);
+            expect(UserService.register).toHaveBeenCalledWith({
                 email: data.email,
                 username: data.username,
                 displayName: data.displayName,
@@ -49,15 +50,15 @@ describe("User Controller", () => {
                 body: data
             } as Request;
 
-            UserController.emailInUse = jest.fn().mockResolvedValue(true);
-            UserController.usernameInUse = jest.fn().mockResolvedValue(false);
-            UserController.createUser = jest.fn().mockRejectedValue(new Error("Should not be called: duplicate email"));
+            UserService.emailInUse = jest.fn().mockResolvedValue(true);
+            UserService.usernameInUse = jest.fn().mockResolvedValue(false);
+            UserService.register = jest.fn().mockRejectedValue(new Error("Should not be called: duplicate email"));
 
             await UserController.registerUser(req, mockedRes);
 
-            expect(UserController.emailInUse).toHaveBeenCalledWith(data.email);
-            expect(UserController.usernameInUse).not.toHaveBeenCalled();
-            expect(UserController.createUser).not.toHaveBeenCalled();
+            expect(UserService.emailInUse).toHaveBeenCalledWith(data.email);
+            expect(UserService.usernameInUse).not.toHaveBeenCalled();
+            expect(UserService.register).not.toHaveBeenCalled();
             expect(mockedRes.status).toHaveBeenCalledWith(409);
             expect(mockedRes.send).toHaveBeenCalledWith({
                 message: "Email already in use"
@@ -69,15 +70,15 @@ describe("User Controller", () => {
                 body: data
             } as Request;
 
-            UserController.emailInUse = jest.fn().mockResolvedValue(false);
-            UserController.usernameInUse = jest.fn().mockResolvedValue(true);
-            UserController.createUser = jest.fn().mockRejectedValue(new Error("Should not be called: duplicate username"));
+            UserService.emailInUse = jest.fn().mockResolvedValue(false);
+            UserService.usernameInUse = jest.fn().mockResolvedValue(true);
+            UserService.register = jest.fn().mockRejectedValue(new Error("Should not be called: duplicate username"));
 
             await UserController.registerUser(req, mockedRes);
 
-            expect(UserController.emailInUse).toHaveBeenCalledWith(data.email);
-            expect(UserController.usernameInUse).toHaveBeenCalledWith(data.username);
-            expect(UserController.createUser).not.toHaveBeenCalled();
+            expect(UserService.emailInUse).toHaveBeenCalledWith(data.email);
+            expect(UserService.usernameInUse).toHaveBeenCalledWith(data.username);
+            expect(UserService.register).not.toHaveBeenCalled();
             expect(mockedRes.status).toHaveBeenCalledWith(409);
             expect(mockedRes.send).toHaveBeenCalledWith({
                 message: "Username already in use"
