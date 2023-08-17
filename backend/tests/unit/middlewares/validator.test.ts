@@ -113,4 +113,25 @@ describe("validator middleware", () => {
         expect(req.body.age).toBe(20);
         expect(next).toHaveBeenCalled();
     });
+
+    // pass non-joi errors to next
+    it("should pass non-joi errors to next", async () => {
+        const req = {
+            body: {
+                name: "test",
+                age: 20
+            }
+        } as Request;
+
+        // mock validator.validateAsync to throw an error
+        const err = new Error("Non-Joi Error");
+        testSchema.validateAsync = jest.fn().mockRejectedValue(err);
+
+        const next = jest.fn();
+
+        await validator<ValidatorTest>(testSchema)(req, mockedRes, next);
+
+        expect(next).toHaveBeenCalledWith(err);
+    });
+    
 });
