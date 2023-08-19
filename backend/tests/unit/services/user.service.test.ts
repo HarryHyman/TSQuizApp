@@ -67,4 +67,4 @@ describe("User Service", () => {
             await expect(UserService.usernameInUse(email)).rejects.toThrow("Database error");
         });
     });
-})
+});
