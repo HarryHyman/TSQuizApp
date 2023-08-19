@@ -27,7 +27,7 @@ export class UserController {
             displayName: info.displayName,
             password: info.password,
             roleId: USER_ROLE_ID
-        }
+        };
 
         await UserService.register(data);
 

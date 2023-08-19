@@ -1,6 +1,6 @@
 import { RegisterUser, registerUserValidator } from "../../../src/validators/registerUser.validator";
 
-describe('Register User Validator', () => {
+describe("Register User Validator", () => {
     it("should validate correctly for valid data", () => {
         const data: RegisterUser = {
             username: "test",
@@ -138,5 +138,5 @@ describe('Register User Validator', () => {
 
         expect(error).toBeDefined();
         expect(error!.details[0].message).toBe("\"username\" is required");
-    })
+    });
 });
