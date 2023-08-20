@@ -29,8 +29,16 @@ export class UserController {
             roleId: USER_ROLE_ID
         };
 
-        await UserService.register(data);
+        const user = await UserService.register(data);
 
-        res.status(204).end();
+        const jwt = await UserService.signJWT(user);
+
+        res.cookie("jwt", jwt, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+
+        res.status(200).send("Login successful");
     }
 }

@@ -8,7 +8,8 @@ const mockedRes = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
-    end: jest.fn()
+    end: jest.fn(),
+    cookie: jest.fn()
 } as unknown as Response;
 
 const data: RegisterUser = {
@@ -41,8 +42,9 @@ describe("User Controller", () => {
                 password: data.password,
                 roleId: 1
             });
-            expect(mockedRes.status).toHaveBeenCalledWith(204);
-            expect(mockedRes.end).toHaveBeenCalled();
+            expect(mockedRes.cookie).toHaveBeenCalled();
+            expect(mockedRes.status).toHaveBeenCalledWith(200);
+            expect(mockedRes.send).toHaveBeenCalledWith("Login successful");
         });
 
         it("should return 409 if email in use", async () => {
