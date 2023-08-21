@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 import { SignJWT, jwtVerify } from "jose";
 import prisma from "./database";
+import { LoginUser } from "../validators/loginUser.validator";
 
 export type CreateUser = {
     email: string,
@@ -11,6 +12,9 @@ export type CreateUser = {
 }
 
 export class UserService {
+    static login(info: LoginUser) {
+        throw new Error("Method not implemented.");
+    }
     static async emailInUse(email: string) {
         const user = await prisma.user.findFirst({
             where: {
