@@ -1,6 +1,8 @@
 import { User } from "@prisma/client";
 import { SignJWT, jwtVerify } from "jose";
 import prisma from "./database";
+import { LoginUser } from "../validators/loginUser.validator";
+import { hash, compare } from "bcrypt";
 
 export type CreateUser = {
     email: string,
@@ -11,6 +13,26 @@ export type CreateUser = {
 }
 
 export class UserService {
+    static async login(info: LoginUser) {
+        // find either email or username
+        const user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: info.identifier },
+                    { username: info.identifier }
+                ]
+            }
+        });
+
+        if (!user) return null;
+
+        const passwordsMatch = await this.comparePassword(info.password, user.password);
+
+        if (!passwordsMatch) return null;
+
+        return user;
+    }
+
     static async emailInUse(email: string) {
         const user = await prisma.user.findFirst({
             where: {
@@ -33,6 +55,8 @@ export class UserService {
 
     static async register(data: CreateUser): Promise<User> {
         // REVIEW: potentially other service-level validation here, e.g. password strength
+
+        data.password = await this.hashPassword(data.password);
 
         const user = await prisma.user.create({
             data: data
@@ -59,5 +83,13 @@ export class UserService {
         const { payload } = await jwtVerify(jwt, secret);
 
         return payload;
+    }
+
+    static async hashPassword(password: string) {
+        return await hash(password, 12);
+    }
+
+    static async comparePassword(password: string, hash: string) {
+        return await compare(password, hash);
     }
 }
