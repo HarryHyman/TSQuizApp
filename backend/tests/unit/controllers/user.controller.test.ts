@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserController } from "../../../src/controllers/user.controller";
 import { RegisterUser } from "../../../src/validators/registerUser.validator";
 import { UserService } from "../../../src/services/user.service";
+import prisma from "../../../src/services/database";
 
 // FIXME: DRY
 const mockedRes = {
@@ -85,6 +86,73 @@ describe("User Controller", () => {
             expect(mockedRes.send).toHaveBeenCalledWith({
                 message: "Username already in use"
             });
+        });
+    });
+
+    describe("Login", () => {
+        it("should login user correctly, if credentials are valid", async () => {
+            const req = {
+                body: {
+                    identifier: data.email,
+                    password: data.password
+                }
+            } as Request;
+
+            UserService.login = jest.fn().mockResolvedValue({ ...data, id: 1 });
+
+            await UserController.login(req, mockedRes);
+
+            expect(UserService.login).toHaveBeenCalledWith({
+                identifier: data.email,
+                password: data.password
+            });
+            expect(mockedRes.cookie).toHaveBeenCalled();
+            expect(mockedRes.status).toHaveBeenCalledWith(200);
+            expect(mockedRes.send).toHaveBeenCalledWith("Login successful");
+        });
+
+        it("should return 401 if credentials are invalid", async () => {
+            const req = {
+                body: {
+                    identifier: data.email,
+                    password: data.password
+                }
+            } as Request;
+
+            UserService.login = jest.fn().mockResolvedValue(null);
+
+            await UserController.login(req, mockedRes);
+
+            expect(UserService.login).toHaveBeenCalledWith({
+                identifier: data.email,
+                password: data.password
+            });
+            expect(mockedRes.cookie).not.toHaveBeenCalled();
+            expect(mockedRes.status).toHaveBeenCalledWith(401);
+            expect(mockedRes.send).toHaveBeenCalledWith({
+                message: "Invalid credentials"
+            });
+        });
+
+        it("should throw error if login throws an error to be caught further up the chain", async () => {
+            const req = {
+                body: {
+                    identifier: data.email,
+                    password: data.password
+                }
+            } as Request;
+
+            // mock prisma to throw an error
+            prisma.user.findFirst = jest.fn().mockRejectedValue(new Error("Database error"));
+
+            await UserController.login(req, mockedRes);
+
+            expect(UserService.login).toHaveBeenCalledWith({
+                identifier: data.email,
+                password: data.password
+            });
+
+            expect(mockedRes.cookie).not.toHaveBeenCalled();
         });
     });
 });

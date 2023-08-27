@@ -6,6 +6,6 @@ export type LoginUser = {
 };
 
 export const loginUserValidator = Joi.object<LoginUser>({
-    identifier: Joi.alternatives().try(Joi.string().email(), Joi.string()), // REVIEW: username length min/max?
+    identifier: Joi.string().required(), // REVIEW: username length min/max?
     password: Joi.string().required()
 });
