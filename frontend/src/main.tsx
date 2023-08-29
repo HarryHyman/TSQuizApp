@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import ErrorPage from './pages/Error';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import { ConfigProvider, theme } from 'antd';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,15 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ConfigProvider
+    theme={{
+      algorithm: theme.darkAlgorithm,
+      token: {
+        colorPrimary: "#646cff",
+      }
+    }}
+    >
+      <RouterProvider router={router} />
+    </ConfigProvider>
   </React.StrictMode>,
 )

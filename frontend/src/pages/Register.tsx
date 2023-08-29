@@ -1,10 +1,13 @@
 import Navbar from "../components/Navbar";
+import RegisterForm from "../components/RegisterForm";
 
 const Register = () => {
-    return <>
-    <Navbar />
-    Register
+    return (
+    <>
+        <Navbar />
+        <RegisterForm />
     </>
+    );
 };
 
 export default Register;
