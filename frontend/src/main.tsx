@@ -33,6 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       algorithm: theme.darkAlgorithm,
       token: {
         colorPrimary: "#646cff",
+        colorSuccess: "#00d25a"
       }
     }}
     >
